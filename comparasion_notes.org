@@ -1,0 +1,66 @@
+#+TITLE:A projekt két korai fázisának összehasonlítása
+#+AUTHOR:Tóth Bálint
+
+* Rövid verziótörténet:
+  A Plot project két verziót tartalmaz: StaticPlots és PlotProject (egybe írva!)
+  Ezek közül a PlotProject volt az első verzió, a StaticPlots a második, fejlettebb változat
+* Fileok
+** Azonos, változtatásmentesen átvett fileok:
+   SignalUtil -> néhány függvény alapján adatsort generál teszteléshez
+** Azonos nevű, de változásokon átment fileok:
+   DataSeries -> egy előre kiszámolt adatsor
+   - PlotProject
+	 - egyszerű pojo, tárolja az adatokat, a saját mintavételezési frekvenciáját, a vonal színét és vastagságát
+	 - konstruálható fload és double adattöbmökből
+	 - mindenhez van getter
+   - StaticPlots
+	 - az előbbiek feturbózott változata
+	 - extra adattagok: startTime, timeWindow (?), maximum minimum érték
+	   isDashed (??) -> valamiért a konstruktorban isDotted van
+** A Line Chart implementációi
+   - PlotProject
+	 - BasicLineChart néven szerepel
+	 - sok magic number
+	   pl:
+	   #+begin_src java
+		 ...
+		 signalCanvas = new Canvas(600+2*padding, 400+2*padding); // a canvas mérete konstans
+		 ...
+         // draw epoch preStimulus marker 
+		 for (int i = 0; i < 21; i++) {
+			 double x = padding + i*(signalCanvas.getWidth()-2*padding)/20.0;
+			 gc.setStroke(Color.LIGHTGRAY);
+			 if ((i % 5) == 0)
+				 gc.setStroke(Color.DARKGREY);
+			 if ((i % 10) == 0)
+				 gc.setStroke(Color.BLUE);
+			 gc.strokeLine(x, padding, x, signalCanvas.getHeight()-padding);
+		 }        
+
+	   #+end_src
+	 - sok változó
+	   konstruktorból nem is lehet beállítani
+	   #+begin_src java
+		 private Map<String, DataSeries> series;
+		 private Map<String, Color> colours;
+		 private double xFactor = 4;
+		 private double yFactor = 25;
+		 private double xOffset = 0;
+		 private double yOffset = 100;
+	   #+end_src
+	 - átméretezéshez be van kötve a canvas a parent-be
+	   #+begin_src java
+        // make sure we resize properly
+        signalCanvas.widthProperty().bind(widthProperty());
+        signalCanvas.heightProperty().bind(heightProperty());
+	   #+end_src
+	 - elvileg valami átméretezésre bekötött change listener is van (?)
+	   [[https://docs.oracle.com/javase/8/javafx/api/toc.htm][ChangeListener a dokumentációban]]
+	   és a programban:
+	   #+begin_src java
+		 ChangeListener<Number> listener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+			 draw(); // redraw chart
+		 };
+		 widthProperty().addListener(listener);
+		 heightProperty().addListener(listener);
+	   #+end_src

@@ -1,0 +1,98 @@
+#+Title:A matlab plot működése
+#+Author:Tóth Bálint
+
+* Linkek
+  [[https://www.mathworks.com/help/matlab/ref/plot.html][matlab plot]]
+  [[https://docs.oracle.com/javase/8/javase-clienttechnologies.htm][oracle javaFX tutorial]]
+  [[https://docs.oracle.com/javase/8/javafx/api/toc.htm][oracle API documentation]]
+* Grafikon kirajzolása
+** plot(x,y)
+   - általában x és y azonos méretű kell hogy legyen
+   - x és y lehetnek vektorok, mátrixok
+** plot(x,y,lineSpec)
+   - lineSpec formázó-string
+** plot(x,y[lineSpec] (x,y,[lineSpec]))	  
+   - általános eset
+   - x & y azonos hosszúságú adattárolók
+   - lineSpec formázóstring
+** plot(x,y,lineSpec,[key,value])
+* LineSpec formázóstring szintaxisa
+  LineSpec - stílus - marker - szín
+  A sorrend nem kötött
+  A tokenek szóközzel elválaszása nem kötelező, de megengedett
+  pl
+  - '--or' = szaggatott vonal, kör markerekkel piros színben
+  - ':r'   = pontozott piros vonal
+  - 'green-.+' = zöld vonal-pont-vonal pluszjel markerekkel
+** Stílus
+   | Stílus | Leírás           |
+   |--------+------------------|
+   | -      | normál vonal     |
+   | --     | szaggatott vonal |
+   | :      | pontozott vonal  |
+   | -.     | vonal-pont-vonal |
+** Marker
+   | Marker            | Leírás                 |
+   |-------------------+------------------------|
+   | 'o'               | kör                    |
+   | '+'               | pluszjel               |
+   | '*'               | csillag                |
+   | '.'               | pont                   |
+   | 'X'               | kereszt                |
+   | '_'               | vízszintes vonal       |
+   | 'square' / 's'    | négyzet                |
+   | 'diamond' / 'd'   | rombusz                |
+   | '^'               | felfele néző háromszög |
+   | 'v'               | lefele néző háromszög  |
+   | '>'               | jobra néző háromszög   |
+   | '<'               | balra néző háromszög   |
+   | 'pentagram' / 'p' | öt ágú csillag         |
+   | 'hexagram' / 'h'  | hat ágú csillag        |
+
+** Szín
+   | Szín      | Minimál | Leírás  |
+   |-----------+---------+---------|
+   | 'yellow'  | 'y'     | sárga   |
+   | 'magenta' | 'm'     | bordó   |
+   | 'cyan'    | 'c'     | ciánkék |
+   | 'red'     | 'r'     | piros   |
+   | 'green'   | 'g'     | zöld    |
+   | 'blue'    | 'b'     | kék     |
+   | 'white'   | 'w'     | fehér   |
+   | 'black'   | 'k'     | fekete  |
+* Kulcs - Érték párok
+** Color
+   Színt lehet vele megadni, a specifikációs stringtől eltérően lehet használni
+   - rgb tripletet: [0 1 0], [0 0.69 1] ...
+   - hexadecimális: #ff00ff ...
+** LineStyle
+   Stílus megadása kulcsszó + a stílust formázó string
+** LineWidth
+   Vonalvastagság megadása
+   paramétere a vonalvastagság pontban: 1 pont = 1/72 inch = 0.3527 mm
+** Marker
+   Marker beállítása
+   paraméternek pontosan azokat lehet megadni, mint a formázóstringben
+** MarkerIndices
+   Pozitív egész számok vektora, ezekre a pontokra tesz majd markert
+** MarkerEdgeColor
+   Marker körvonalának színe
+** MarkerFaceColor
+   Marker kitöltő színe
+** MarkerSize
+   Marker mérete pontban: 1 pont = 1/72 inch
+* Egyéb sallang elhelyezése
+** title()
+** xlabel()
+** ylabel()
+* Grafikon-paraméterek beállítása
+** grid()
+   - 'on': bekapcsolva, minden osztáshoz tesz négyzethálót
+   - 'off': kikapcsolva, nincs négyzetháló
+   - 'minor': sűrű osztásos négyzetháló
+** xlim()
+   2 elemű vektort kap, második elem nagyobb, mint az első
+   Beállítja az abszcissza tartományát
+** ylim()
+   2 elemű vektort kap, második elem nagyobb, mint az első
+   Beállítja az oordináta tartományát
