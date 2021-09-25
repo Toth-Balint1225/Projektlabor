@@ -48,13 +48,35 @@
 		 private double xOffset = 0;
 		 private double yOffset = 100;
 	   #+end_src
+	 - alapvetően a Canvas osztályt használja rajzoláshoz;
+	   [[https://docs.oracle.com/javase/8/javafx/graphics-tutorial/canvas.htm#JFXGR214][Canvas példa]] és demo kód:
+	   #+begin_src java
+		 class MyApp extends Application {
+	
+			 @Override
+			 public void start() {
+				 StackPane root = new StackPane();
+				 Canvas canvas = new Canvas(200,200);
+				 root.getChildren.add(canvas);
+				 GraphicsContext gc = canvas.getGraphicsContext2D();
+				 gc.strokeLine(10,10,100,100);
+				 stage.setScene(new Scene(root));
+				 stage.show();
+			 }
+
+			 public static void main(String[] args) {
+				 launch(args);
+			 }
+		 }
+	   #+end_src
 	 - átméretezéshez be van kötve a canvas a parent-be
 	   #+begin_src java
         // make sure we resize properly
         signalCanvas.widthProperty().bind(widthProperty());
         signalCanvas.heightProperty().bind(heightProperty());
 	   #+end_src
-	 - elvileg valami átméretezésre bekötött change listener is van (?)
+	 - az átméretezéshez pedig az implementációs osztályokban van
+	   a listener.
 	   [[https://docs.oracle.com/javase/8/javafx/api/toc.htm][ChangeListener a dokumentációban]]
 	   és a programban:
 	   #+begin_src java
@@ -63,4 +85,43 @@
 		 };
 		 widthProperty().addListener(listener);
 		 heightProperty().addListener(listener);
+	   #+end_src
+   - StaticPlots
+	 - Nem skálázható, semmi Listener
+	 - Nem GraphicContext-re rajzol, hanem a Line osztály-példányokat adogat
+	   önmagához.
+	   pl:
+	   #+begin_src java
+        xAxis = new Line(leftPix,botPix,rightPix,botPix);
+        yAxis = new Line(leftPix,topPix,leftPix,botPix);
+        xAxisTop = new Line(leftPix,topPix,rightPix,topPix);
+        yAxisTop = new Line(rightPix,topPix,rightPix,botPix);
+        
+        this.getChildren().addAll(xAxis,yAxis,xAxisTop,yAxisTop);
+        
+        for(int i=0;i<dsList.size();i++){
+            this.getChildren().add(seriesGen(dsList.get(i)));
+        }
+	   #+end_src
+	 - ehez szükséges, hogy a Pane osztályból származzon. demo:
+	   #+begin_src java
+		 class MyApp extends Application {  // base application
+			 class MyPane extends Pane {    // származtatunk egy saját ablakot
+				 private Line myLine = new Line(10,10,100,100); 
+				 public MyPane() {
+					 getChildren().add(myLine);  // beletesszük a vonalat
+				 }
+			 }
+
+			 @Override
+			 public void start(Stage stage) {    // innentől normál app
+				 MyPane root = new MyPane();
+				 stage.setScene(new Scene(root));
+				 stage.show();
+			 }
+
+			 public static void main(String[] args) {
+				 launch(args);
+			 }
+		 }
 	   #+end_src
