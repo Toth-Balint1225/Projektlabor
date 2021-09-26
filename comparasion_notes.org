@@ -4,10 +4,10 @@
 * Rövid verziótörténet:
   A Plot project két verziót tartalmaz: StaticPlots és PlotProject (egybe írva!)
   Ezek közül a PlotProject volt az első verzió, a StaticPlots a második, fejlettebb változat
-* Fileok
-** Azonos, változtatásmentesen átvett fileok:
+* Osztályok
+** Azonos, változtatásmentesen átvett osztályok:
    SignalUtil -> néhány függvény alapján adatsort generál teszteléshez
-** Azonos nevű, de változásokon átment fileok:
+** Azonos nevű, de változásokon átment osztályok:
    DataSeries -> egy előre kiszámolt adatsor
    - PlotProject
 	 - egyszerű pojo, tárolja az adatokat, a saját mintavételezési frekvenciáját, a vonal színét és vastagságát
@@ -18,110 +18,185 @@
 	 - extra adattagok: startTime, timeWindow (?), maximum minimum érték
 	   isDashed (??) -> valamiért a konstruktorban isDotted van
 ** A Line Chart implementációi
-   - PlotProject
-	 - BasicLineChart néven szerepel
-	 - sok magic number
-	   pl:
-	   #+begin_src java
-		 ...
-		 signalCanvas = new Canvas(600+2*padding, 400+2*padding); // a canvas mérete konstans
-		 ...
-         // draw epoch preStimulus marker 
-		 for (int i = 0; i < 21; i++) {
-			 double x = padding + i*(signalCanvas.getWidth()-2*padding)/20.0;
-			 gc.setStroke(Color.LIGHTGRAY);
-			 if ((i % 5) == 0)
-				 gc.setStroke(Color.DARKGREY);
-			 if ((i % 10) == 0)
-				 gc.setStroke(Color.BLUE);
-			 gc.strokeLine(x, padding, x, signalCanvas.getHeight()-padding);
-		 }        
+*** PlotProject
+	- BasicLineChart néven szerepel
+	- sok magic number
+	  pl:
+      #+begin_src java
+		...
+		signalCanvas = new Canvas(600+2*padding, 400+2*padding); // a canvas mérete konstans
+		...
+		// draw epoch preStimulus marker 
+		for (int i = 0; i < 21; i++) {
+			double x = padding + i*(signalCanvas.getWidth()-2*padding)/20.0;
+			gc.setStroke(Color.LIGHTGRAY);
+			if ((i % 5) == 0)
+				gc.setStroke(Color.DARKGREY);
+			if ((i % 10) == 0)
+				gc.setStroke(Color.BLUE);
+			gc.strokeLine(x, padding, x, signalCanvas.getHeight()-padding);
+		}        
 
-	   #+end_src
-	 - sok változó
-	   konstruktorból nem is lehet beállítani
-	   #+begin_src java
-		 private Map<String, DataSeries> series;
-		 private Map<String, Color> colours;
-		 private double xFactor = 4;
-		 private double yFactor = 25;
-		 private double xOffset = 0;
-		 private double yOffset = 100;
-	   #+end_src
-	 - alapvetően a Canvas osztályt használja rajzoláshoz;
-	   [[https://docs.oracle.com/javase/8/javafx/graphics-tutorial/canvas.htm#JFXGR214][Canvas példa]] és demo kód:
-	   #+begin_src java
-		 class MyApp extends Application {
+	  #+end_src
+	- sok változó
+		konstruktorból nem is lehet beállítani
+		#+begin_src java
+		  private Map<String, DataSeries> series;
+		  private Map<String, Color> colours;
+		  private double xFactor = 4;
+		  private double yFactor = 25;
+		  private double xOffset = 0;
+		  private double yOffset = 100;
+		#+end_src
+	  - alapvetően a Canvas osztályt használja rajzoláshoz;
+		[[https://docs.oracle.com/javase/8/javafx/graphics-tutorial/canvas.htm#JFXGR214][Canvas példa]] és demo kód:
+		#+begin_src java
+		  class MyApp extends Application {
 	
-			 @Override
-			 public void start() {
-				 StackPane root = new StackPane();
-				 Canvas canvas = new Canvas(200,200);
-				 root.getChildren.add(canvas);
-				 GraphicsContext gc = canvas.getGraphicsContext2D();
-				 gc.strokeLine(10,10,100,100);
-				 stage.setScene(new Scene(root));
-				 stage.show();
-			 }
+			  @Override
+			  public void start() {
+				  StackPane root = new StackPane();
+				  Canvas canvas = new Canvas(200,200);
+				  root.getChildren.add(canvas);
+				  GraphicsContext gc = canvas.getGraphicsContext2D();
+				  gc.strokeLine(10,10,100,100);
+				  stage.setScene(new Scene(root));
+				  stage.show();
+			  }
 
-			 public static void main(String[] args) {
-				 launch(args);
-			 }
-		 }
-	   #+end_src
-	 - átméretezéshez be van kötve a canvas a parent-be
-	   #+begin_src java
-        // make sure we resize properly
-        signalCanvas.widthProperty().bind(widthProperty());
-        signalCanvas.heightProperty().bind(heightProperty());
-	   #+end_src
-	 - az átméretezéshez pedig az implementációs osztályokban van
-	   a listener.
-	   [[https://docs.oracle.com/javase/8/javafx/api/toc.htm][ChangeListener a dokumentációban]]
-	   és a programban:
-	   #+begin_src java
-		 ChangeListener<Number> listener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-			 draw(); // redraw chart
-		 };
-		 widthProperty().addListener(listener);
-		 heightProperty().addListener(listener);
-	   #+end_src
-   - StaticPlots
-	 - Nem skálázható, semmi Listener
-	 - Nem GraphicContext-re rajzol, hanem a Line osztály-példányokat adogat
-	   önmagához.
-	   pl:
-	   #+begin_src java
-        xAxis = new Line(leftPix,botPix,rightPix,botPix);
-        yAxis = new Line(leftPix,topPix,leftPix,botPix);
-        xAxisTop = new Line(leftPix,topPix,rightPix,topPix);
-        yAxisTop = new Line(rightPix,topPix,rightPix,botPix);
-        
-        this.getChildren().addAll(xAxis,yAxis,xAxisTop,yAxisTop);
-        
-        for(int i=0;i<dsList.size();i++){
-            this.getChildren().add(seriesGen(dsList.get(i)));
-        }
-	   #+end_src
-	 - ehez szükséges, hogy a Pane osztályból származzon. demo:
-	   #+begin_src java
-		 class MyApp extends Application {  // base application
-			 class MyPane extends Pane {    // származtatunk egy saját ablakot
-				 private Line myLine = new Line(10,10,100,100); 
-				 public MyPane() {
-					 getChildren().add(myLine);  // beletesszük a vonalat
-				 }
-			 }
+			  public static void main(String[] args) {
+				  launch(args);
+			  }
+		  }
+		#+end_src
+	  - átméretezéshez be van kötve a canvas a parent-be
+		#+begin_src java
+		 // make sure we resize properly
+		 signalCanvas.widthProperty().bind(widthProperty());
+		 signalCanvas.heightProperty().bind(heightProperty());
+		#+end_src
+	  - az átméretezéshez pedig az implementációs osztályokban van
+		a listener.
+		[[https://docs.oracle.com/javase/8/javafx/api/toc.htm][ChangeListener a dokumentációban]]
+		és a programban:
+		#+begin_src java
+		  ChangeListener<Number> listener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+			  draw(); // redraw chart
+		  };
+		  widthProperty().addListener(listener);
+		  heightProperty().addListener(listener);
+		#+end_src
+*** StaticPlots
+	- Nem skálázható, semmi Listener
+	- Nem GraphicContext-re rajzol, hanem a Line osztály-példányokat adogat
+	  önmagához.
+	  pl:
+	  #+begin_src java
+		xAxis = new Line(leftPix,botPix,rightPix,botPix);
+		yAxis = new Line(leftPix,topPix,leftPix,botPix);
+		xAxisTop = new Line(leftPix,topPix,rightPix,topPix);
+		yAxisTop = new Line(rightPix,topPix,rightPix,botPix);
 
-			 @Override
-			 public void start(Stage stage) {    // innentől normál app
-				 MyPane root = new MyPane();
-				 stage.setScene(new Scene(root));
-				 stage.show();
-			 }
+		this.getChildren().addAll(xAxis,yAxis,xAxisTop,yAxisTop);
 
-			 public static void main(String[] args) {
-				 launch(args);
-			 }
-		 }
-	   #+end_src
+		for(int i=0;i<dsList.size();i++){
+			this.getChildren().add(seriesGen(dsList.get(i)));
+		}
+	  #+end_src
+	- ehez szükséges, hogy a Pane osztályból származzon. demo:
+	  #+begin_src java
+		class MyApp extends Application {  // base application
+			class MyPane extends Pane {    // származtatunk egy saját ablakot
+				private Line myLine = new Line(10,10,100,100); 
+				public MyPane() {
+					getChildren().add(myLine);  // beletesszük a vonalat
+				}
+			}
+
+			@Override
+			public void start(Stage stage) {    // innentől normál app
+				MyPane root = new MyPane();
+				stage.setScene(new Scene(root));
+				stage.show();
+			}
+
+			public static void main(String[] args) {
+				launch(args);
+			}
+		}
+	  #+end_src
+*** StaticPlots::ResizeableBoundedLinechart
+	- Méretezhető line chart
+	- Ugyanúgy Line példányokat használ
+	- Be van kötve minden elem heightProperty() és widthProperty() - je
+	  -> a java automatice méretezi a Line példányokat
+	  #+begin_src java
+		public void createBindings(){
+			//Binding axes          
+			xAxis.startXProperty().bind(this.widthProperty().multiply(0.125));
+			xAxis.endXProperty().bind(this.widthProperty().multiply(0.875));
+			xAxis.startYProperty().bind(this.heightProperty().divide(450).multiply(350));
+			xAxis.endYProperty().bind(this.heightProperty().divide(450).multiply(350));
+
+			xAxisTop.startXProperty().bind(this.widthProperty().multiply(0.125));
+			xAxisTop.endXProperty().bind(this.widthProperty().multiply(0.875));
+			xAxisTop.startYProperty().bind(this.heightProperty().divide(450).multiply(100));
+			xAxisTop.endYProperty().bind(this.heightProperty().divide(450).multiply(100));
+
+			yAxis.startXProperty().bind(this.widthProperty().multiply(0.125));
+			yAxis.endXProperty().bind(this.widthProperty().multiply(0.125));
+			yAxis.startYProperty().bind(this.heightProperty().divide(450).multiply(100));
+			yAxis.endYProperty().bind(this.heightProperty().divide(450).multiply(350));
+
+			yAxisTop.startXProperty().bind(this.widthProperty().multiply(0.875));
+			yAxisTop.endXProperty().bind(this.widthProperty().multiply(0.875));
+			yAxisTop.startYProperty().bind(this.heightProperty().divide(450).multiply(100));
+			yAxisTop.endYProperty().bind(this.heightProperty().divide(450).multiply(350));
+
+			for(int i=0;i<xTickMarks.size();i++){
+				xTickMarks.get(i).startXProperty().bind(this.widthProperty().multiply(xTickMarks.get(i).getStartX()).divide(800));
+				xTickMarks.get(i).endXProperty().bind(this.widthProperty().multiply(xTickMarks.get(i).getEndX()).divide(800));
+				xTickMarks.get(i).startYProperty().bind(this.heightProperty().multiply(xTickMarks.get(i).getStartY()).divide(450));
+				xTickMarks.get(i).endYProperty().bind(this.heightProperty().multiply(xTickMarks.get(i).getEndY()).divide(450));
+
+				xLabels.get(i).xProperty().bind(xTickMarks.get(i).endXProperty().subtract(xLabels.get(i).getLayoutBounds().getWidth()/2));
+				xLabels.get(i).yProperty().bind(xTickMarks.get(i).endYProperty().add(16));
+			}
+
+			for(int i=0;i<yTickMarks.size();i++){
+				yTickMarks.get(i).startXProperty().bind(this.widthProperty().multiply(yTickMarks.get(i).getStartX()).divide(800));
+				yTickMarks.get(i).endXProperty().bind(this.widthProperty().multiply(yTickMarks.get(i).getEndX()).divide(800));
+				yTickMarks.get(i).startYProperty().bind(this.heightProperty().multiply(yTickMarks.get(i).getStartY()).divide(450));
+				yTickMarks.get(i).endYProperty().bind(this.heightProperty().multiply(yTickMarks.get(i).getEndY()).divide(450));
+
+				yLabels.get(i).xProperty().bind(yTickMarks.get(i).endXProperty().subtract(24));
+				yLabels.get(i).yProperty().bind(yTickMarks.get(i).endYProperty().add(yLabels.get(i).getLayoutBounds().getHeight()/4));
+			}
+
+			for(int i=0;i<seriesLabels.size();i++){
+				seriesLabels.get(i).xProperty().bind(this.widthProperty().multiply(seriesLabels.get(i).getX()).divide(800));
+				seriesLabels.get(i).yProperty().bind(this.heightProperty().multiply(seriesLabels.get(i).getY()).divide(450));
+			}
+
+			xAxisLabel.xProperty().bind(this.widthProperty().multiply(xAxisLabel.getX()).divide(800));
+			xAxisLabel.yProperty().bind(this.heightProperty().multiply(xAxisLabel.getY()).divide(450));
+
+			yAxisLabel.xProperty().bind(this.widthProperty().multiply(yAxisLabel.getX()).divide(800));
+			yAxisLabel.yProperty().bind(this.heightProperty().multiply(yAxisLabel.getY()).divide(450));
+
+			graphLabel.xProperty().bind(this.widthProperty().multiply(graphLabel.getX()).divide(800));
+			graphLabel.yProperty().bind(this.heightProperty().multiply(graphLabel.getY()).divide(450));
+		}
+	  #+end_src
+	- Vannak nem bind-olható elemek, ezekhez be van kötve listener,
+	  manuálisan újraszámolódnak
+	#+begin_src java
+	  this.widthProperty().addListener(new ChangeListener<Number>(){
+		  @Override
+		  public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			  refreshNonBindableNodes();
+		  }
+	  });
+	#+end_src
+    - Maga a refreshNonBindableNodes() függvény az adatok görbéjét méretezi újra: polyLineList, polygonList
+	- Egyébként minden mint a LineChart osztályban
