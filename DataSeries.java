@@ -4,7 +4,7 @@ public class DataSeries {
     private String name;
     private double startValue;
     private double endValue;
-    private double frequency;
+    private int frequency;
     private Function<Double,Double> fun;
 
     private double[] rawData;
@@ -13,7 +13,7 @@ public class DataSeries {
         name = "default";
         startValue = 0.f;
         endValue = 0.f;
-        frequency = 0.f;
+        frequency = 0;
         fun = null;
     }
 
@@ -33,7 +33,7 @@ public class DataSeries {
     }
 
     
-    public DataSeries withFrequency(double frequency) {
+    public DataSeries withFrequency(int frequency) {
         this.frequency = frequency;
         return this;
     }
@@ -50,7 +50,7 @@ public class DataSeries {
         } else {
             // hány elem kell?
             double span = this.endValue - this.startValue;
-            this.rawData = new double[(int)span*(int)frequency];
+            this.rawData = new double[frequency];
 
             generateData(span);
         }
@@ -59,11 +59,12 @@ public class DataSeries {
     }
 
     private void generateData(double span) {
-        double incrementer = 1/frequency;
         double actual;
-        for (int i=0;i<rawData.length;i++) {
+        for (int i=0;i<frequency;i++) {
             actual = span/frequency*i;
             rawData[i] = fun.apply(actual);
+            System.out.print(actual);
+            System.out.print(" ");
             System.out.println(rawData[i]);
         }
     }
@@ -72,9 +73,9 @@ public class DataSeries {
         DataSeries ds = new DataSeries()
             .withName("Jenő")
             .withStartValue(0.d)
-            .withEndValue(1.d)
-            .withFrequency(10.d)
-            .withFunction((x) -> 2*x)
+            .withEndValue(3.14d)
+            .withFrequency(64)
+            .withFunction((x) -> Math.sin(x))
             .makeSeries();
     }
 } 
