@@ -1,4 +1,4 @@
-package fluent; // terminálból futtatáskor lehet ki kell kommentezni
+//package fluent; // terminálból futtatáskor lehet ki kell kommentezni
 
 
 /*
@@ -181,6 +181,7 @@ public class Chart {
     }
 
     public static void main(String[] args) {
+
         // használat:
         Chart chart = new Chart()                          // létrehozás
                 .withTitle()                               // belépés title beállítási módba
