@@ -1,5 +1,36 @@
 import java.util.function.Function;
 
+/*
+    néhány gondolat a mintavételezésről és a fogalmak tisztázása
+    def: Mintavételezésnek nevzzük a függvénybe behelyettesítést az értelmezési tartomány egy pontján.    (D1)
+    def: Frekvenciának nevezzük a mintavételek számát; jele: freq                                         (D2)
+    def: Értelmezési tartomány hossza: span, minimum értéke minValue, maximum értéke maxValue             
+         span = maxValue - minValue                                                                       (D3)
+    def: az i-ik mintavételi pontot a(i)-vel jelöljük.                                                    (D4)
+    feltétel: az értelmezési tartomány kezdeti és végpontja mindig mintavételi pont kell hogy legyen.     (F1)
+    feltétel: mindig frekvencia számú mintavétel kell, hogy történjen                                     (F2)
+    állítás: (F1)-ből következik, hogy a mintavételek száma, tehát a frekvencia legalább 2.               (T1)
+    állítás: a(i) = minValue + (i*span) / (freq-1), minden 2<=freq, 0<=i<freq-re                          (T2)
+    bizonyítás:
+        freq=2   =>  a(i) = minValue + (i*span) / (2-1)
+                     a(i) = minValue + i*span
+        => a(0) = minValue, mert minValue + (0*span) / (2-1) = minValue + 0
+        => a(1) = maxValue, mert minVAlue + (1*span) / (2-1) = minValue + span = maxValue (D3)
+        => (F1), (F2) teljesül, alapeset kész
+        
+        freq=n   =>  a(i) = minValue + (i*span) / (n-1)
+        => a(0)   = minValue
+        => a(n-1) = minVAlue + ((n-1)*span) / (n-1) = minValue + span = maxValue (D3)
+        => (F1), (F2) teljesül, általános eset kész
+
+        freq=n+1 => a(i) = minValue + (i*span) / ((n+1)-1)
+                    a(i) = minValue + (i*span) / n
+        => a(0) = minValue + (0*span) / n = minValue
+        => a(n) = minValue + (n*span) / n = minValue + span = maxValue (D3)
+        => (F1), (F2) teljesül 
+        Q.E.D.
+*/
+
 public class DataSeries {
     private String name;
     private double startValue;
@@ -35,6 +66,8 @@ public class DataSeries {
     
     public DataSeries withFrequency(int frequency) {
         this.frequency = frequency;
+        // foglalja is egyből a tömböt
+        this.rawData = new double[frequency];
         return this;
     }
 
@@ -50,8 +83,6 @@ public class DataSeries {
         } else {
             // hány elem kell?
             double span = this.endValue - this.startValue;
-            this.rawData = new double[frequency];
-
             generateData(span);
         }
         // adatok
@@ -59,22 +90,23 @@ public class DataSeries {
     }
 
     private void generateData(double span) {
-        double actual;
-        for (int i=0;i<frequency;i++) {
-            actual = span/frequency*i;
+        // az előző verzió kalap szar, de a célnak megfelelt
+        // itt jön a tuti dolog
+        double actual = 0.d;
+        for (int i=0;i<this.frequency;i++) {
+            actual = this.startValue + (i*span) / (this.frequency-1);
             rawData[i] = fun.apply(actual);
-            System.out.print(actual);
-            System.out.print(" ");
-            System.out.println(rawData[i]);
+            // demo funkcionalitás
+            System.out.println(i+"\tx="+actual+"\ty="+rawData[i]);
         }
     }
 
     public static void main(String[] args) {
         DataSeries ds = new DataSeries()
-            .withName("Jenő")
+            .withName("Sine")
             .withStartValue(0.d)
-            .withEndValue(3.14d)
-            .withFrequency(64)
+            .withEndValue(0.5d)
+            .withFrequency(10)
             .withFunction((x) -> Math.sin(x))
             .makeSeries();
     }
