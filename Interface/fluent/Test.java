@@ -1,6 +1,15 @@
 package fluent;
 
+// this is experimental and subject to change
+// with this, we won't need the LineAttribs.lineAttribs(), but just lineAttribs
+// btw, this is the static factory method of the lineAttribs class
+import static fluent.LineAttribs.lineAttribs;
 
+// figure's static import
+import static fluent.Figure.figure;
+
+// the other lineAttribs' static import
+import static fluent.LineAttribs2.style;
 /*
 
 the goal is:
@@ -24,15 +33,22 @@ public class Test {
         double[] y = new double[]{4,5,6};
 
 
-        Figure figure = Figure.create()
-            .plot(x,y,LineAttribs.create()
+        Figure figure = figure()
+            .plot(x,y,lineAttribs()
                 .color("r")
                 .style("-")
                 .width(2))
             .plot(y,x,"Color:red","Width:3")
         ;
 
+        // another solution would be:... .plot(x,y,style("-").color("r").width(2)), where style is the obligatory static factory method
+        // let's call the example subject plot2
+
+        Figure other = figure()
+            .plot(x,y,style("-").color("r").width(3));
+
 
         System.out.println(figure);
+        System.out.println(other);
     }
 }

@@ -5,18 +5,6 @@ public class LineAttribs {
     private int width;
     private String style;
 
-    public enum LineStyle {
-        STRAIGHT,
-        DOT,
-        DASH,
-        DASH_DOT
-    }
-
-    public enum MarkerType {
-        SQUARE,
-        CROSS,
-        CIRCLE,
-    }
 
     public LineAttribs() {
         color = "red";
@@ -24,7 +12,8 @@ public class LineAttribs {
         style = "-";
     }
 
-    static public LineAttribs create() {
+    // with the static import, the create method can change to lineAttribs
+    static public LineAttribs lineAttribs() {
         return new LineAttribs();
     }
 
@@ -43,7 +32,4 @@ public class LineAttribs {
         return this;
     }
 
-    public LineAttribs style(LineStyle style) {
-        return this;
-    }
 }

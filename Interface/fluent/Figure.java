@@ -27,7 +27,16 @@ public class Figure {
         return this;
     }
 
-    static public Figure create() {
+    // another static import with the static factory
+    static public Figure figure() {
         return new Figure();
+    }
+
+
+    // the 2. line attribs setting
+    public Figure plot(double[] x, double[] y, LineAttribs2 attr) {
+        this.plot = new Plot(); // later be list
+        // interpreter from attr to plot here
+        return this;
     }
 }
