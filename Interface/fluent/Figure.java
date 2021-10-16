@@ -27,6 +27,20 @@ public class Figure {
         return this;
     }
 
+    // some redesign is needed for the plot class: 
+    // instead of taking two arrays and the formatting strings, it will take
+    // an unspecified number of "line" objects, so we can display multiple lines in one plot
+    // line would have a static factory method, so the whole thing should look like
+    /*
+        figure()
+            .plot(line(x,y,"Style:-")
+                , line(x2,y2,"Color:red","Style:--")
+                , line(x3,y3,style("-").color("red")));
+    */
+    public Figure plot(Line ... lines) {
+        return this;
+    }
+
     // another static import with the static factory
     static public Figure figure() {
         return new Figure();

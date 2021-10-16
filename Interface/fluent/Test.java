@@ -10,6 +10,10 @@ import static fluent.Figure.figure;
 
 // the other lineAttribs' static import
 import static fluent.LineAttribs2.style;
+
+// static import for the line object
+import static fluent.Line.*;
+
 /*
 
 the goal is:
@@ -47,8 +51,16 @@ public class Test {
         Figure other = figure()
             .plot(x,y,style("-").color("r").width(3));
 
+        // inputting multiple lines to a plot function
+        Figure unlimited = figure()
+            .plot(line(x,y,style("-").width(2))
+                , line(y,x,"Style:-","Color:green")
+                , line(x,y,"Style:--","Color:blue")
+            )
+        ;
 
         System.out.println(figure);
         System.out.println(other);
+        System.out.println(unlimited);
     }
 }
