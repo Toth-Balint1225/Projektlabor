@@ -12,7 +12,14 @@ public class LineAttribs {
         style = "-";
     }
 
+    public LineAttribs(String style) {
+        this.style = style;
+        color = "red";
+        width = 1;
+    }
+
     // with the static import, the create method can change to lineAttribs
+    @Deprecated
     static public LineAttribs lineAttribs() {
         return new LineAttribs();
     }
@@ -27,9 +34,10 @@ public class LineAttribs {
         return this;
     }
 
-    public LineAttribs style(String style) {
-        this.style = style;
-        return this;
+    // new static factory method inherited from the removed
+    // LineAttribs2 implementation
+    public static LineAttribs style(String style) {
+        return new LineAttribs(style);
     }
 
 }

@@ -3,13 +3,11 @@ package fluent;
 // this is experimental and subject to change
 // with this, we won't need the LineAttribs.lineAttribs(), but just lineAttribs
 // btw, this is the static factory method of the lineAttribs class
-import static fluent.LineAttribs.lineAttribs;
+import static fluent.LineAttribs.*;
 
 // figure's static import
 import static fluent.Figure.figure;
 
-// the other lineAttribs' static import
-import static fluent.LineAttribs2.style;
 
 // static import for the line object
 import static fluent.Line.*;
@@ -36,7 +34,8 @@ public class Test {
         double[] x = new double[]{1,2,3};
         double[] y = new double[]{4,5,6};
 
-
+/*
+        // this solution is deprecated
         Figure figure = figure()
             .plot(x,y,lineAttribs()
                 .color("r")
@@ -44,7 +43,7 @@ public class Test {
                 .width(2))
             .plot(y,x,"Color:red","Width:3")
         ;
-
+*/
         // another solution would be:... .plot(x,y,style("-").color("r").width(2)), where style is the obligatory static factory method
         // let's call the example subject plot2
 
@@ -59,7 +58,6 @@ public class Test {
             )
         ;
 
-        System.out.println(figure);
         System.out.println(other);
         System.out.println(unlimited);
     }

@@ -9,11 +9,13 @@ public class Figure {
         return this;
     }
 
+    @Deprecated
     public Figure plot(double[] x, double[] y, LineAttribs attr) {
         this.plot = new Plot();
         return this;
     }
 
+    @Deprecated
     public Figure plot(double[] x, double[] y, String ... args) {
         LineAttribs attribs = new LineAttribs();
         // for each pair -> parse attribs
@@ -46,11 +48,4 @@ public class Figure {
         return new Figure();
     }
 
-
-    // the 2. line attribs setting
-    public Figure plot(double[] x, double[] y, LineAttribs2 attr) {
-        this.plot = new Plot(); // later be list
-        // interpreter from attr to plot here
-        return this;
-    }
 }
